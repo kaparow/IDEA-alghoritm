@@ -13,10 +13,10 @@ typedef unsigned char POSITION;
 class IDEA
 {
 private:
-	string message = "";
-	string key = "";
-	vector<PART> subkeys;
-	static const int PARTSIZE = 8;
+	string message = ""; //Строка для входного текста
+	string key = ""; // ключ для шифровки/расшифровки
+	vector<PART> subkeys; //вектор, содержащий подключи, используемые в алгоритме.
+	static const int PARTSIZE = 8; //константа, устанавливающая размер блока данных.
 
 
 	static BIT getBit(PART var, POSITION pos) {
@@ -24,12 +24,15 @@ private:
 		if (var % 2 == 0)
 			return 0;
 		return 1;
+		//функция получает значение бита в указанной позиции из 
+		// переданного блока данных типа PART или unsigned char.
 	}
 
 	static void setBit(PART& var, POSITION pos, BIT val) {
 		PART temp = val;
 		temp = temp << (pos - 1);
 		var = var | temp;
+		//устанавливает бит на указанной позиции в переданном блоке
 	}
 
 	static BIT getBit(unsigned char var, POSITION pos) {
@@ -57,7 +60,7 @@ private:
 				charCounter--;
 			}
 		}
-
+		//функция конвертирует два символа типа unsigned char в формат PART (16 бит).
 	}
 
 	static string PARTtoChars(PART p) {
@@ -75,9 +78,10 @@ private:
 		if (a != 0)
 			result += (char)a;
 		return result;
+		//функция обратная TwoCharsToPART, конвертирует PART обратно в два символа.
 	}
 
-	static uint16_t multiplyModulus(uint16_t a, uint16_t b) {
+	static uint16_t multiplyModulus(uint16_t a, uint16_t b) //unsigned short{
 		uint32_t temp;
 		temp = a * b;
 
@@ -88,6 +92,7 @@ private:
 			temp = 1 - a - b;
 		}
 		return temp & 0xFFFF;
+		// выполняет операцию умножения двух чисел по модулю (2^16 + 1).
 	}
 
 	static uint16_t inverseMultiply(uint16_t a) {
@@ -117,12 +122,14 @@ private:
 			u += 0x10001;
 		}
 		return u;
+		//находит обратное значение по умножению в поле GF(2 ^ 16 + 1).
 	}
 
 
 
 	static PART additionModulus(PART a, PART b) {
 		return ((uint32_t)a + (uint32_t)b) % MAX_LIMIT;
+		//выполняет операцию сложения двух чисел по модулю 2^16.
 	}
 
 	static string encrypt_16in4(unsigned char buffer[], vector<PART> subkeys) {
@@ -197,6 +204,8 @@ private:
 		result += PARTtoChars(P4);
 
 		return result;
+		//Функция принимает 16 байт данных и вектор подключей, 
+		// затем выполняет шифрование с использованием алгоритма IDEA.
 	}
 
 	static vector<PART> subkeyGeneration(string key) {
@@ -224,6 +233,8 @@ private:
 
 
 		return result;
+		//Генерирует подключи на основе переданного ключа. 
+		// Используется при инициализации объекта класса IDEA.
 	}
 
 	/*static void printInBit(PART item) {
@@ -254,6 +265,7 @@ private:
 				first_bit = last_bit;
 			}
 		}
+		//Выполняет циклический сдвиг влево для вектора подключей.
 	}
 	static string decrypt8chars(unsigned char buffer[], vector<PART> subkeys) {
 		string result = "";
@@ -279,6 +291,8 @@ private:
 				p_counter++;
 				counter = 0;
 			}
+			//Функция принимает 8 байт данных и вектор подключей, 
+			// затем выполняет дешифрование с использованием алгоритма IDEA.
 		}
 
 		PART K1 = 0;
@@ -338,6 +352,7 @@ public:
 	IDEA(string message, string key) {
 		setMessage(message);
 		setKey(key);
+		
 	}
 
 	IDEA() {}
@@ -347,6 +362,7 @@ public:
 	string getMessage() {
 		return this->message;
 	}
+	//возвращают хранимое сообщение и ключ соответственно.
 	string getKey() {
 		return this->key;
 	}
@@ -360,6 +376,8 @@ public:
 		}
 		this->message = message;
 	}
+	//устанавливают сообщение и ключ, 
+	// ри необходимости дополняя сообщение пробелами.
 
 	void setKey(string key) {
 		if (key.length() != 16) {
@@ -407,6 +425,8 @@ public:
 		}
 
 		return result;
+		//шифрует сообщение, разбивая его на 
+		// блоки и применяя функцию encrypt_16in4.
 	}
 
 	string decrypt(string encrypted_message, vector<PART> subkeys) {
